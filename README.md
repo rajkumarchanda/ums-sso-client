@@ -18,6 +18,8 @@ SmartExam (UMS) issues a signed token after the user approves SSO. This package 
 ```bash
 composer require ums-lspl/sso-client
 php artisan vendor:publish --tag=smartexam-sso-config
+php artisan vendor:publish --tag=smartexam-sso-migrations
+php artisan migrate
 ```
 
 ## Configuration
