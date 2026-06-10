@@ -1,5 +1,5 @@
 {
-    "name": "ums/sso-client",
+    "name": "ums-lspl/sso-client",
     "description": "Laravel client package for SmartExam SSO — verify tokens and authenticate users in consumer apps.",
     "type": "library",
     "license": "MIT",
