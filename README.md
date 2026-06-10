@@ -44,7 +44,7 @@ php artisan migrate
 ### From Packagist (when published)
 
 ```bash
-composer require ums/sso-client
+composer require ums-lspl/sso-client
 php artisan vendor:publish --tag=smartexam-sso-config
 ```
 
