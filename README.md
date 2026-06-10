@@ -15,34 +15,6 @@ SmartExam (UMS) issues a signed token after the user approves SSO. This package 
 
 ## Installation
 
-### From this monorepo (path)
-
-In your consumer app's `composer.json`:
-
-```json
-{
-    "repositories": [
-        {
-            "type": "path",
-            "url": "../smartexam-new/packages/ums/sso-client",
-            "options": { "symlink": true }
-        }
-    ],
-    "require": {
-        "ums/sso-client": "@dev"
-    }
-}
-```
-
-```bash
-composer require ums/sso-client:@dev
-php artisan vendor:publish --tag=smartexam-sso-config
-php artisan vendor:publish --tag=smartexam-sso-migrations
-php artisan migrate
-```
-
-### From Packagist (when published)
-
 ```bash
 composer require ums-lspl/sso-client
 php artisan vendor:publish --tag=smartexam-sso-config
