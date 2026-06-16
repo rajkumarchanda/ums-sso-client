@@ -4,7 +4,7 @@ Laravel package for consumer apps that sign users in with **SmartExam SSO**.
 
 SmartExam issues a signed token after the user approves login. This package verifies the token, creates or updates a local user, and starts a Laravel session.
 
-**Requirements:** PHP 8.2+, Laravel 10–12, and an SSO application in **SmartExam Admin → SSO → Applications**.
+**Requirements:** PHP 8.1+, Laravel 9–12, and an SSO application in **SmartExam Admin → SSO → Applications**.
 
 ---
 
