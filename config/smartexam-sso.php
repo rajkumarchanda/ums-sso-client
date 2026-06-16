@@ -42,9 +42,18 @@ return [
     |--------------------------------------------------------------------------
     |
     | Must match the `aud` claim in the token (your consumer app base URL).
+    | Defaults to the origin of SSO_CALLBACK_URL, then APP_URL.
     |
     */
-    'audience' => rtrim(env('APP_URL', ''), '/'),
+    'audience' => rtrim(
+        env('SSO_AUDIENCE') ?: (
+            ($scheme = parse_url((string) env('SSO_CALLBACK_URL', ''), PHP_URL_SCHEME))
+            && ($host = parse_url((string) env('SSO_CALLBACK_URL', ''), PHP_URL_HOST))
+                ? $scheme.'://'.$host
+                : (string) env('APP_URL', '')
+        ),
+        '/'
+    ),
 
     /*
     |--------------------------------------------------------------------------

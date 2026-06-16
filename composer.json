@@ -3,6 +3,17 @@
     "description": "Laravel client package for SmartExam SSO — verify tokens and authenticate users in consumer apps.",
     "type": "library",
     "license": "MIT",
+    "keywords": [
+        "laravel",
+        "sso",
+        "smartexam",
+        "authentication"
+    ],
+    "homepage": "https://github.com/rajkumarchanda/ums-sso-client",
+    "support": {
+        "issues": "https://github.com/rajkumarchanda/ums-sso-client/issues",
+        "source": "https://github.com/rajkumarchanda/ums-sso-client"
+    },
     "authors": [
         {
             "name": "Raj Kumar Chanda",
@@ -37,6 +48,8 @@
             ]
         }
     },
-    "minimum-stability": "stable",
+    "scripts": {
+        "test": "phpunit"
+    },
     "prefer-stable": true
 }
