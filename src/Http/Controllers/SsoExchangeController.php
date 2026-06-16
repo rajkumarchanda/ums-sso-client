@@ -5,17 +5,16 @@ namespace SmartExam\SsoClient\Http\Controllers;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use InvalidArgumentException;
-use SmartExam\SsoClient\Contracts\SsoUserProvisioner;
-use SmartExam\SsoClient\Services\SmartExamSsoVerifier;
+use RuntimeException;
+use SmartExam\SsoClient\Services\SsoAuthenticationService;
+use Symfony\Component\HttpFoundation\Response;
 
 class SsoExchangeController extends Controller
 {
     public function __construct(
-        protected SmartExamSsoVerifier $verifier,
-        protected SsoUserProvisioner $provisioner,
+        protected SsoAuthenticationService $authentication,
     ) {}
 
     /**
@@ -32,25 +31,25 @@ class SsoExchangeController extends Controller
             'state' => 'nullable|string|max:255',
         ]);
 
-        if (($data['expiresAt'] ?? 0) > 0 && $data['expiresAt'] < time()) {
-            return response()->json(['message' => 'SSO token has expired.'], 401);
-        }
-
         try {
-            $this->verifier->verifyState($data['state'] ?? null, session(config('smartexam-sso.state_session_key')));
-            $payload = $this->verifier->verify($data['token']);
+            $this->authentication->assertNotExpired($data['expiresAt'] ?? null);
+            $payload = $this->authentication->verifyToken($data['token'], $data['state'] ?? null);
+            $user = $this->authentication->loginFromPayload($request, $payload);
         } catch (InvalidArgumentException $exception) {
             Log::warning('SmartExam SSO exchange rejected', ['reason' => $exception->getMessage()]);
 
             return response()->json(['message' => $exception->getMessage()], 401);
+        } catch (RuntimeException $exception) {
+            if (str_contains($exception->getMessage(), 'not configured')) {
+                Log::error('SmartExam SSO exchange misconfigured', ['reason' => $exception->getMessage()]);
+
+                return response()->json(['message' => $exception->getMessage()], 503);
+            }
+
+            Log::error('SmartExam SSO exchange failed', ['reason' => $exception->getMessage()]);
+
+            return response()->json(['message' => 'SSO login failed.'], 500);
         }
-
-        session()->forget(config('smartexam-sso.state_session_key'));
-
-        $user = $this->provisioner->fromPayload($payload);
-
-        Auth::login($user, remember: true);
-        $request->session()->regenerate();
 
         return response()->json([
             'message' => 'Authenticated',

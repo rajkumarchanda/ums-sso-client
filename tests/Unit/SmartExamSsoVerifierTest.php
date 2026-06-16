@@ -88,4 +88,32 @@ class SmartExamSsoVerifierTest extends TestCase
 
         $verifier->verify($token);
     }
+
+    public function test_it_rejects_missing_required_claims(): void
+    {
+        $secret = 'secret';
+        $encodedPayload = base64_encode(json_encode([
+            'iss' => 'https://ums.example.com',
+            'aud' => 'https://mail.example.com',
+            'sub' => 1,
+            'name' => 'Jane',
+            'email' => '',
+            'iat' => time(),
+            'exp' => time() + 120,
+            'session_id' => 'sess',
+        ]));
+
+        $token = $encodedPayload.'.'.hash_hmac('sha256', $encodedPayload, $secret);
+
+        $verifier = new SmartExamSsoVerifier(
+            $secret,
+            'https://ums.example.com',
+            'https://mail.example.com'
+        );
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Missing required SSO claim: email.');
+
+        $verifier->verify($token);
+    }
 }

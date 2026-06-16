@@ -7,6 +7,9 @@ use RuntimeException;
 
 class SmartExamSsoVerifier
 {
+    /** @var list<string> */
+    protected array $requiredClaims = ['sub', 'email', 'name'];
+
     public function __construct(
         protected ?string $secret = null,
         protected ?string $expectedIssuer = null,
@@ -57,17 +60,41 @@ class SmartExamSsoVerifier
             throw new InvalidArgumentException('SSO token has expired.');
         }
 
+        $this->validateRequiredClaims($payload);
+
         return $payload;
     }
 
     public function verifyState(?string $received, ?string $expected): void
     {
+        $requireState = (bool) config('smartexam-sso.require_state', true);
+
         if ($expected === null || $expected === '') {
+            if ($requireState) {
+                throw new InvalidArgumentException('Missing SSO state in session.');
+            }
+
             return;
         }
 
         if (! is_string($received) || ! hash_equals($expected, $received)) {
             throw new InvalidArgumentException('Invalid SSO state parameter.');
+        }
+    }
+
+    /**
+     * @param  array<string, mixed>  $payload
+     */
+    protected function validateRequiredClaims(array $payload): void
+    {
+        foreach ($this->requiredClaims as $claim) {
+            if (! isset($payload[$claim]) || $payload[$claim] === '') {
+                throw new InvalidArgumentException("Missing required SSO claim: {$claim}.");
+            }
+        }
+
+        if (! is_string($payload['email']) || ! filter_var($payload['email'], FILTER_VALIDATE_EMAIL)) {
+            throw new InvalidArgumentException('Invalid email claim in SSO token.');
         }
     }
 }

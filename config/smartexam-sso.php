@@ -90,4 +90,15 @@ return [
 
     'after_login_redirect' => env('SSO_AFTER_LOGIN_REDIRECT', '/'),
 
+    /*
+    |--------------------------------------------------------------------------
+    | CSRF state requirement
+    |--------------------------------------------------------------------------
+    |
+    | When true, SSO requests are rejected unless a matching state value was
+    | stored in session before opening the SmartExam prompt.
+    |
+    */
+    'require_state' => env('SMARTEXAM_SSO_REQUIRE_STATE', true),
+
 ];
